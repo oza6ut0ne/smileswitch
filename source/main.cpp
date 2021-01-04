@@ -18,9 +18,6 @@
 
 const std::string SEPARATOR = std::string("##SEP##");
 
-static int sock_nxlink = -1;
-static double fps = 60.0;
-
 
 int main(int argc, char **argv) {
     if (R_FAILED(appletSetAutoSleepDisabled(true))) {
@@ -32,9 +29,8 @@ int main(int argc, char **argv) {
     }
 
     if (R_SUCCEEDED(socketInitializeDefault())) {
-        sock_nxlink = nxlinkStdio();
-        if (sock_nxlink < 0) {
-            socketExit();
+        if (nxlinkStdio() < 0) {
+            std::cerr << "nxlinkStdio(): failed" << std::endl;
         }
     }
 
@@ -80,6 +76,7 @@ int main(int argc, char **argv) {
         should_exit = true;
     }
 
+    double fps = 60.0;
     SDL_Event event;
     std::vector<std::unique_ptr<Comment>> comments;
     while (!should_exit && appletMainLoop()) {
@@ -152,8 +149,6 @@ int main(int argc, char **argv) {
     SDL_Quit();
     romfsExit();
 
-    if (sock_nxlink >= 0) {
-        socketExit();
-    }
+    socketExit();
     return 0;
 }
